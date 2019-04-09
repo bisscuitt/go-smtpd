@@ -58,6 +58,7 @@ type MailAddress interface {
 // customizing their own Servers.
 type Connection interface {
 	Addr() net.Addr
+	LocalAddr() net.Addr
 	Close() error // to force-close a connection
 }
 
@@ -187,6 +188,10 @@ func (s *session) sendSMTPErrorOrLinef(err error, format string, args ...interfa
 
 func (s *session) Addr() net.Addr {
 	return s.rwc.RemoteAddr()
+}
+
+func (s *session) LocalAddr() net.Addr {
+	return s.rwc.LocalAddr()
 }
 
 func (s *session) Close() error { return s.rwc.Close() }
