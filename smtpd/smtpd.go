@@ -34,6 +34,7 @@ var (
 type Server struct {
 	Addr         string        // TCP address to listen on, ":25" if empty
 	Hostname     string        // optional Hostname to announce; "" to use system hostname
+	Software     string        // optional Software to announce; "" to use default "gosmtpd"
 	ReadTimeout  time.Duration // optional read timeout
 	WriteTimeout time.Duration // optional write timeout
 
@@ -103,6 +104,13 @@ func (srv *Server) hostname() string {
 		return ""
 	}
 	return strings.TrimSpace(string(out))
+}
+
+func (srv *Server) software() string {
+	if srv.Software != "" {
+		return srv.Software
+	}
+	return "gosmtpd"
 }
 
 // ListenAndServe listens on the TCP network address srv.Addr and then
@@ -204,7 +212,7 @@ func (s *session) serve() {
 			return
 		}
 	}
-	s.sendf("220 %s ESMTP gosmtpd\r\n", s.srv.hostname())
+	s.sendf("220 %s ESMTP %s\r\n", s.srv.hostname(), s.srv.software())
 	for {
 		if s.srv.ReadTimeout != 0 {
 			s.rwc.SetReadDeadline(time.Now().Add(s.srv.ReadTimeout))
